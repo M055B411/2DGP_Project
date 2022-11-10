@@ -1,55 +1,48 @@
-import random
-
-from pico2d import *
+from object import *
 import game_framework
-import player
-import object
+import game_world
 
+from player import Player
 
 worldtick = 0
-Tile = None
 
 def enter():
     global player, cursor, Tile
     hide_cursor()
-    player = player.Player()
-    cursor = object.cursor()
-    Tile = load_image("temp_tile.png")
+    player = Player()
+    cursor = cursor()
+    Tile = Tile()
+
+    game_world.add_object(Tile, 0)
+    game_world.add_object(player, 2)
+    game_world.add_object(cursor, 4)
     pass
 
 def exit():
-    global player, cursor
-    del player, cursor
+    global player, cursor, Tile
+    del player, cursor, Tile
     pass
 
 def update():
     global worldtick
     worldtick = (worldtick + 1) % 60
 
-    if worldtick == 0 and len(object.bomb.bomb_list) < 6:
-        temp = object.bomb(random.randrange(50,750), random.randrange(50,550), 30)
-        object.bomb.bomb_list.append(temp)
+    if worldtick == 0 and len(bomb.bomb_list) < 6:
+        temp = bomb(random.randrange(50,750), random.randrange(50,550), 30)
+        bomb.bomb_list.append(temp)
+        game_world.add_object(temp, 2)
     player.update()
-    for b in object.Bullet.Bullet_list:
-        b.update()
-    for b in object.bomb.bomb_list:
-        b.update()
+    for game_object in game_world.all_objects():
+        game_object.update()
     pass
+
+def draw_world():
+    for game_object in game_world.all_objects():
+        game_object.draw()
 
 def draw():
     clear_canvas()
-    Tile.draw(400, 300)
-    player.draw()
-
-    for b in object.bomb.bomb_list:
-        if b.inexplo == True:
-            b.explo_draw()
-        else:
-            b.draw()
-    for b in object.Bullet.Bullet_list:
-        b.draw()
-
-    cursor.draw()
+    draw_world()
     update_canvas()
     pass
 
@@ -83,7 +76,7 @@ def handle_events():
             elif event.key == SDLK_d:
                 player.unmove(3)
             elif event.key == SDLK_p:
-                for b in object.bomb.bomb_list:
+                for b in bomb.bomb_list:
                     if b.inexplo == False:
                         b.explosion()
         elif player.state != player.statement['move'] and event.type == SDL_MOUSEMOTION:
@@ -91,8 +84,8 @@ def handle_events():
 
         elif event.type == SDL_MOUSEBUTTONDOWN and event.button == SDL_BUTTON_LEFT:
             player.state = player.statement['shoot']
-            temp = object.Bullet(player.x, player.y, event.x, event.y)
-            temp.addlist()
+            temp = Bullet(player.x, player.y, event.x, event.y)
+            game_world.add_object(temp, 3)
 
     pass
 

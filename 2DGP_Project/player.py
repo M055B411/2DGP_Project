@@ -7,7 +7,7 @@ class Player(Object):
         self.x, self.y = 400, 300
         self.statement = {'idle': 4, 'move': 2, 'shoot': 4}
         self.look = {'front': 0, 'right': 1, 'back': 2, 'back_right': 3, 'left': 4, 'back_left': 6, 'front_left': 7, 'front_right': 8}
-        self.hp = 50
+        self.hp = 20
         self.frame = 0
         self.tick = 0
         self.lookat = self.look['front']
@@ -18,31 +18,34 @@ class Player(Object):
         self.dirx, self.diry = 0, 0
 
     def update(self):
-        self.tick = (self.tick + 1) % 8
-        if self.tick == 0:
-            self.frame = (self.frame + 1) % self.state
+        if self.hp == 0:
+            print("player dead")
+        else:
+            self.tick = (self.tick + 1) % 8
+            if self.tick == 0:
+                self.frame = (self.frame + 1) % self.state
 
-        self.state_check()
-        if self.dirx == 1 and self.diry == 1:
-            self.x += 2/1.414
-            self.y += 2/1.414
-        elif self.dirx == 1 and self.diry == -1:
-            self.x += 2/1.414
-            self.y -= 2/1.414
-        elif self.dirx == -1 and self.diry == 1:
-            self.x -= 2/1.414
-            self.y += 2/1.414
-        elif self.dirx == -1 and self.diry == -1:
-            self.x -= 2/1.414
-            self.y -= 2/1.414
-        elif self.dirx == 1 and self.diry == 0:
-            self.x += 2
-        elif self.dirx == -1 and self.diry == 0:
-            self.x -= 2
-        elif self.dirx == 0 and self.diry == 1:
-            self.y += 2
-        elif self.dirx == 0 and self.diry == -1:
-            self.y -= 2
+            self.state_check()
+            if self.dirx == 1 and self.diry == 1:
+                self.x += 2/1.414
+                self.y += 2/1.414
+            elif self.dirx == 1 and self.diry == -1:
+                self.x += 2/1.414
+                self.y -= 2/1.414
+            elif self.dirx == -1 and self.diry == 1:
+                self.x -= 2/1.414
+                self.y += 2/1.414
+            elif self.dirx == -1 and self.diry == -1:
+                self.x -= 2/1.414
+                self.y -= 2/1.414
+            elif self.dirx == 1 and self.diry == 0:
+                self.x += 2
+            elif self.dirx == -1 and self.diry == 0:
+                self.x -= 2
+            elif self.dirx == 0 and self.diry == 1:
+                self.y += 2
+            elif self.dirx == 0 and self.diry == -1:
+                self.y -= 2
 
     def draw(self):
         size = 22
