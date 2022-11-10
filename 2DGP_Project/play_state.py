@@ -2,6 +2,7 @@ import random
 
 from pico2d import *
 import game_framework
+import player
 import object
 
 
@@ -11,7 +12,7 @@ Tile = None
 def enter():
     global player, cursor, Tile
     hide_cursor()
-    player = object.Player()
+    player = player.Player()
     cursor = object.cursor()
     Tile = load_image("temp_tile.png")
     pass
