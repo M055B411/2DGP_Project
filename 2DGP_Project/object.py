@@ -43,9 +43,17 @@ class Object:
     image = None
 
     def StoScheck(self, other):
-        if self.x > other.x:
-            if self.x - other.x < (self.size + other.size) / 2:
-                pass
+        if self.x - self.size / 2 > other.x + other.size / 2:
+            return False
+        elif self.x + self.size / 2 < other.x - other.size / 2:
+            return False
+        elif self.y - self.size / 2 > other.y + other.size / 2:
+            return False
+        elif self.y + self.size / 2 < other.y - other.size / 2:
+            return False
+        else:
+            return True
+    pass
 
 
     def CtoDcheck(self, other):
@@ -68,12 +76,13 @@ class bomb(Object):
         self.x = x
         self.y = y
         self.hp = 5
-        self.size = 64
+        self.size = 21
         self.tick = 0
         self.inexplo = False
         self.damage = 2
+        self.faction = 3
         if Range == None:
-            Range == 1
+            Range == 64
         self.Range = Range
         self.frame = random.randrange(0, 7)
         if bomb.image == None:
@@ -110,12 +119,16 @@ class bomb(Object):
 
 class Bullet(Object):
 
-    def __init__(self, x, y, x2, y2, range = None, hp = None):
+    def __init__(self, x, y, x2, y2, range = None, hp = None, faction = None):
         self.x = x
         self.y = y
         self.size = 5
         self.tox = x2
         self.toy = y2
+        if faction == None:
+            self.faction == None
+        else:
+            self.faction = faction
         self.angle = math.atan2(600 - self.toy - self.y, self.tox - self.x)
         if Bullet.image == None:
             Bullet.image = load_image('Player.png')
@@ -133,13 +146,15 @@ class Bullet(Object):
                 game_world.remove_object(self)
         for obj in game_world.layer_objects(2):
             if self.StoScheck(obj):
-                if self.Range == 0:
-                    obj.hp -= self.hp
-                else:
-                    for o in game_world.layer_objects(2):
-                        if self.CtoDcheck(o):
-                            o.hp -= self.hp
-                game_world.remove_object(self)
+                if self.faction != obj.faction:
+                    print("collide")
+                    if self.Range == 0:
+                        obj.hp -= self.hp
+                    else:
+                        for o in game_world.layer_objects(2):
+                            if self.CtoDcheck(o):
+                                o.hp -= self.hp
+                    game_world.remove_object(self)
         self.move()
         if self.x > 800 or self.x < 0:
             game_world.remove_object(self)

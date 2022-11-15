@@ -10,12 +10,29 @@ class Player(Object):
         self.hp = 20
         self.frame = 0
         self.tick = 0
+        self.size = 22
         self.lookat = self.look['front']
         self.state = self.statement['idle']
+        self.faction = 1
         if Player.image == None:
             Player.image = load_image("Player.png")
         self.range = 10
         self.dirx, self.diry = 0, 0
+        self.iscollidex, self.iscollidey = False, False
+
+    def collision(self, other):
+        if self.StoScheck(other):
+            if self.faction != other.faction:
+                print("collide")
+                if self.x - self.size / 2 > other.x + other.size / 2:
+                    self.x = other.x + other.size / 2 + self.size / 2
+                elif self.x + self.size / 2 < other.x - other.size / 2:
+                    self.x = other.x - other.size / 2 - self.size / 2
+                elif self.y - self.size / 2 > other.y + other.size / 2:
+                    self.y = other.y + other.size / 2 + self.size / 2
+                elif self.y + self.size / 2 < other.y - other.size / 2:
+                    self.y = other.y - other.size / 2 - self.size / 2
+
 
     def update(self):
         if self.hp == 0:
@@ -26,6 +43,7 @@ class Player(Object):
                 self.frame = (self.frame + 1) % self.state
 
             self.state_check()
+
             if self.dirx == 1 and self.diry == 1:
                 self.x += 2/1.414
                 self.y += 2/1.414
@@ -46,6 +64,11 @@ class Player(Object):
                 self.y += 2
             elif self.dirx == 0 and self.diry == -1:
                 self.y -= 2
+
+            for o in game_world.objects[1]:
+                self.collision(o)
+            for o in game_world.objects[2]:
+                self.collision(o)
 
     def draw(self):
         size = 22

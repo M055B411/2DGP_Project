@@ -84,7 +84,7 @@ def handle_events():
 
         elif event.type == SDL_MOUSEBUTTONDOWN and event.button == SDL_BUTTON_LEFT:
             player.state = player.statement['shoot']
-            temp = Bullet(player.x, player.y, event.x, event.y)
+            temp = Bullet(player.x, player.y, event.x, event.y, faction= 1)
             game_world.add_object(temp, 3)
 
     pass
