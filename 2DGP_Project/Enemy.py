@@ -238,9 +238,9 @@ class enemy3(enemy):
                 self.image.clip_composite_draw(5 + 49 * self.frame, 727 - 547, 49, 34, 0, 'h', self.x, self.y, 49, 34)
         if self.state == 'MOVE':
             if self.dir == 1:
-                self.image.clip_draw(5 + 49 * self.frame, 727 - 547 - 34, 49, 34, self.x, self.y)
+                self.image.clip_draw(5 + 50 * self.frame, 727 - 547 - 34, 49, 34, self.x, self.y)
             elif self.dir == -1:
-                self.image.clip_composite_draw(5 + 49 * self.frame, 727 - 547 - 34, 49, 34, 0, 'h', self.x, self.y, 49, 34)
+                self.image.clip_composite_draw(5 + 50 * self.frame, 727 - 547 - 34, 49, 34, 0, 'h', self.x, self.y, 49, 34)
         if self.state == 'TELE':
             if self.dir == 1:
                 self.image.clip_draw(5 + 49 * self.frame, 727 - 547 - 34 * 2, 49, 34, self.x, self.y)
@@ -362,9 +362,9 @@ class enemy4(enemy):
                                                    60)
             if self.state == 'MOVE':
                 if self.dir == 1:
-                    self.image.clip_draw(5 + 42 * self.frame, 727 - (358+42*2), 42, 42, self.x, self.y, 60, 60)
+                    self.image.clip_draw(5 + 43 * self.frame, 727 - (358+42*2), 42, 42, self.x, self.y, 60, 60)
                 elif self.dir == -1:
-                    self.image.clip_composite_draw(5 + 42 * self.frame, 727 - (358+42*2), 42, 42, 0, 'h', self.x,
+                    self.image.clip_composite_draw(5 + 43 * self.frame, 727 - (358+42*2), 42, 42, 0, 'h', self.x,
                                                    self.y, 60, 60)
             if self.state == 'ATTACK':
                 if self.dir == 1:

@@ -12,12 +12,8 @@ def enter():
     hide_cursor()
     player = Player()
     cursor = cursor()
-    Tile = Tile()
-
-
-
-
-    game_world.add_object(Tile, 0)
+    # Tile = Tile()
+    # game_world.add_object(Tile, 0)
     game_world.add_object(player, 2)
     game_world.add_object(cursor, 4)
     pass
