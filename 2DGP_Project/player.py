@@ -57,6 +57,15 @@ class Player(Object):
             elif self.dirx == 0 and self.diry == -1:
                 self.y -= 2
 
+            if self.x > 800:
+                self.x = 800
+            if self.x < 0:
+                self.x = 0
+            if self.y > 600:
+                self.y = 0
+            if self.y < 0:
+                self.y = 0
+
             for o in game_world.objects[1]:
                 self.collision(o)
             for o in game_world.objects[2]:

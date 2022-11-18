@@ -129,7 +129,7 @@ class bomb(Object):
 
 
 class Bullet(Object):
-
+    image2 = None
     def __init__(self, x, y, x2, y2, range = None, hp = None, faction = None):
         self.x = x
         self.y = y
@@ -143,6 +143,7 @@ class Bullet(Object):
         self.angle = math.atan2(self.toy - self.y, self.tox - self.x)
         if Bullet.image == None:
             Bullet.image = load_image('Player.png')
+
         if range == None:
             self.Range = 0
         else: self.Range = range
@@ -173,7 +174,6 @@ class Bullet(Object):
             game_world.remove_object(self)
 
 
-
     def move(self):
         self.x += 5 * math.cos(self.angle)
         self.y += 5 * math.sin(self.angle)
@@ -181,3 +181,144 @@ class Bullet(Object):
 
     def draw(self):
         self.image.clip_draw(233, 768 - 43, 5, 5, self.x, self.y)
+
+
+class CARBullet(Object):
+    image2 = None
+    def __init__(self, x, y, x2, y2, hp = None):
+        self.x = x
+        self.y = y
+        self.size = 24
+        self.tox = x2
+        self.toy = y2
+        self.damage = 3
+        self.frame = 0
+        self.inexplo = False
+        if self.x > self.tox:
+            self.dir = -1
+        elif self.x < self.tox:
+            self.dir = 1
+        self.faction = 2
+        self.tick = 0
+        self.angle = math.atan2(self.toy - self.y, self.tox - self.x)
+        if CARBullet.image == None:
+            CARBullet.image = load_image('enemy.png')
+        if CARBullet.image2 == None:
+            CARBullet.image2 = load_image('Explosion.png')
+        self.Range = 80
+        if hp == None:
+            self.hp = 1
+        else: self.hp = hp
+
+    def update(self):
+        if not self.inexplo:
+            self.move()
+            if self.dir == 1:
+                if self.x > self.tox:
+                    self.explode()
+            elif self.dir == -1:
+                if self.x < self.tox:
+                    self.explode()
+            for obj in game_world.layer_objects(1):
+                if self.StoScheck(obj):
+                    self.explode()
+            for obj in game_world.layer_objects(2):
+                if self.StoScheck(obj):
+                    if self.faction != obj.faction:
+                        print("collide")
+                        self.explode()
+
+
+
+        if self.inexplo:
+            self.tick = (self.tick + 1) % 10
+            if self.tick == 0:
+                self.frame += 1
+                for obj in game_world.layer_objects(2):
+                    if self.CtoDcheck(obj):
+                        obj.hp -= self.damage
+            if self.frame >= 4:
+                temp = CAR(self.x, self.y)
+                game_world.add_object(temp, 1)
+                game_world.remove_object(self)
+
+        if self.x > 800 or self.x < 0:
+            game_world.remove_object(self)
+        elif self.y > 600 or self.y < 0:
+            game_world.remove_object(self)
+
+
+    def move(self):
+        self.x += 5 * math.cos(self.angle)
+        self.y += 5 * math.sin(self.angle)
+        pass
+
+    def draw(self):
+        if self.inexplo:
+            self.image2.clip_draw(64 * self.frame, 64, 64, 64, self.x, self.y, 80, 80)
+        else:
+            self.image.clip_draw(92, 768 - 525, 35, 24, self.x, self.y, 40, 30)
+
+    def explode(self):
+        self.inexplo = True
+        self.frame = 0
+
+
+class CAR(Object):
+    bomb_list = []
+    image = None
+    image2 = None
+
+    def __init__(self , x, y, Range = None):
+        self.x = x
+        self.y = y
+        self.hp = 20
+        self.size = 40
+        self.tick = 0
+        self.inexplo = False
+        self.damage = 2
+        self.faction = 2
+        if Range == None:
+            Range == 80
+        else: self.Range = Range
+        if CAR.image == None:
+            CAR.image = load_image('enemy.png')
+        if CAR.image2 == None:
+            CAR.image2 = load_image('Explosion.png')
+
+    def draw(self):
+        if self.inexplo:
+            self.image2.clip_draw(64 * self.frame, 64, 64, 64, self.x, self.y, 80, 80)
+        else:
+            self.image.clip_draw(92, 768 - 525, 35, 24, self.x, self.y, 40, 30)
+
+    def update(self):
+        for o in game_world.objects[2]:
+            if self.StoScheck(o):
+                if self.x - self.size / 2 > o.x + o.size / 2:
+                    o.x -= self.size/2 + o.size /2
+                elif self.x + self.size / 2 < o.x - o.size / 2:
+                    o.x += self.size/2 + o.size /2
+                elif self.y - self.size / 2 > o.y + o.size / 2:
+                    o.y -= self.size/2 + o.size /2
+                elif self.y + self.size / 2 < o.y - o.size / 2:
+                    o.y += self.size / 2 + o.size / 2
+        if self.hp <= 0 and not self.inexplo:
+            self.explosion()
+        if self.inexplo:
+            self.tick = (self.tick + 1) % 10
+            if self.tick == 0:
+                self.frame += 1
+                for obj in game_world.layer_objects(2):
+                    if self.CtoDcheck(obj):
+                        obj.hp -= self.damage
+            if self.frame == 4:
+                game_world.remove_object(self)
+
+
+    def explosion(self):
+        self.inexplo = True
+        self.frame = 0
+
+
+

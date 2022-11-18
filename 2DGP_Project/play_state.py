@@ -15,15 +15,11 @@ def enter():
     Tile = Tile()
 
 
+
+
     game_world.add_object(Tile, 0)
     game_world.add_object(player, 2)
     game_world.add_object(cursor, 4)
-    # temp = Enemy.enemy1(random.randrange(50,750), random.randrange(50,550))
-    # game_world.add_object(temp, 2)
-    # temp = Enemy.enemy2(random.randrange(50, 750), random.randrange(50, 550))
-    # game_world.add_object(temp, 2)
-    temp = Enemy.enemy3(random.randrange(50, 750), random.randrange(50, 550))
-    game_world.add_object(temp, 2)
     pass
 
 def exit():
@@ -36,7 +32,7 @@ def update():
     worldtick = (worldtick + 1) % 60
 
     if worldtick == 0 and len(bomb.bomb_list) < 6:
-        temp = bomb(random.randrange(50,750), random.randrange(50,550), 30)
+        temp = bomb(random.randrange(50, 750), random.randrange(50, 550), 30)
         bomb.bomb_list.append(temp)
         game_world.add_object(temp, 2)
     player.update()
@@ -74,6 +70,29 @@ def handle_events():
                 player.move(2)
             elif event.key == SDLK_d:
                 player.move(3)
+            elif event.key == SDLK_1:
+                temp = Enemy.enemy1(random.randrange(50, 750), random.randrange(50, 550))
+                game_world.add_object(temp, 2)
+            elif event.key == SDLK_2:
+                temp = Enemy.enemy2(random.randrange(50, 750), random.randrange(50, 550))
+                game_world.add_object(temp, 2)
+            elif event.key == SDLK_3:
+                temp = Enemy.enemy3(random.randrange(50, 750), random.randrange(50, 550))
+                game_world.add_object(temp, 2)
+            elif event.key == SDLK_4:
+                temp = Enemy.enemy4(random.randrange(50, 750), random.randrange(50, 550))
+                game_world.add_object(temp, 2)
+                temp = CAR(random.randrange(50, 750), random.randrange(50, 550))
+                game_world.add_object(temp, 1)
+            elif event.key == SDLK_r:
+                for o in game_world.objects[2]:
+                    if o.faction == 2:
+                        o.hp = 0
+                for o in game_world.objects[1]:
+                    game_world.remove_object(o)
+                player.x = 400
+                player.y = 300
+                player.hp = 20
         elif event.type == SDL_KEYUP:
             if event.key == SDLK_w:
                 player.unmove(0)
