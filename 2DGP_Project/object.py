@@ -40,6 +40,7 @@ class Object:
     size = 0
     Range = 0
     frame = 0
+    faction = None
     image = None
 
     def StoScheck(self, other):
@@ -97,7 +98,17 @@ class bomb(Object):
             self.image.clip_draw(5 + (21 * self.frame), 30, 21, 21, self.x, self.y)
 
     def update(self):
-        if self.hp == 0:
+        for o in game_world.objects[2]:
+            if self.StoScheck(o):
+                if self.x - self.size / 2 > o.x + o.size / 2:
+                    o.x -= self.size/2 + o.size /2
+                elif self.x + self.size / 2 < o.x - o.size / 2:
+                    o.x += self.size/2 + o.size /2
+                elif self.y - self.size / 2 > o.y + o.size / 2:
+                    o.y -= self.size/2 + o.size /2
+                elif self.y + self.size / 2 < o.y - o.size / 2:
+                    o.y += self.size / 2 + o.size / 2
+        if self.hp <= 0 and not self.inexplo:
             self.explosion()
         if self.inexplo:
             self.tick = (self.tick + 1) % 10
@@ -129,7 +140,7 @@ class Bullet(Object):
             self.faction == None
         else:
             self.faction = faction
-        self.angle = math.atan2(600 - self.toy - self.y, self.tox - self.x)
+        self.angle = math.atan2(self.toy - self.y, self.tox - self.x)
         if Bullet.image == None:
             Bullet.image = load_image('Player.png')
         if range == None:

@@ -24,18 +24,10 @@ class Player(Object):
         if self.StoScheck(other):
             if self.faction != other.faction:
                 print("collide")
-                if self.x - self.size / 2 > other.x + other.size / 2:
-                    self.x = other.x + other.size / 2 + self.size / 2
-                elif self.x + self.size / 2 < other.x - other.size / 2:
-                    self.x = other.x - other.size / 2 - self.size / 2
-                elif self.y - self.size / 2 > other.y + other.size / 2:
-                    self.y = other.y + other.size / 2 + self.size / 2
-                elif self.y + self.size / 2 < other.y - other.size / 2:
-                    self.y = other.y - other.size / 2 - self.size / 2
 
 
     def update(self):
-        if self.hp == 0:
+        if self.hp <= 0:
             print("player dead")
         else:
             self.tick = (self.tick + 1) % 8

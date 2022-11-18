@@ -1,6 +1,7 @@
 from object import *
 import game_framework
 import game_world
+import Enemy
 
 from player import Player
 
@@ -13,9 +14,16 @@ def enter():
     cursor = cursor()
     Tile = Tile()
 
+
     game_world.add_object(Tile, 0)
     game_world.add_object(player, 2)
     game_world.add_object(cursor, 4)
+    # temp = Enemy.enemy1(random.randrange(50,750), random.randrange(50,550))
+    # game_world.add_object(temp, 2)
+    # temp = Enemy.enemy2(random.randrange(50, 750), random.randrange(50, 550))
+    # game_world.add_object(temp, 2)
+    temp = Enemy.enemy3(random.randrange(50, 750), random.randrange(50, 550))
+    game_world.add_object(temp, 2)
     pass
 
 def exit():
@@ -84,7 +92,7 @@ def handle_events():
 
         elif event.type == SDL_MOUSEBUTTONDOWN and event.button == SDL_BUTTON_LEFT:
             player.state = player.statement['shoot']
-            temp = Bullet(player.x, player.y, event.x, event.y, faction= 1)
+            temp = Bullet(player.x, player.y, event.x, 600 - event.y, faction= 1)
             game_world.add_object(temp, 3)
 
     pass
