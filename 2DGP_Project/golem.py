@@ -1,5 +1,5 @@
 from Enemy import *
-from car import CARBullet
+from car import CARBullet, CAR
 
 
 class Golem(enemy):
@@ -102,14 +102,8 @@ class Golem(enemy):
                     self.dir = 1
                 if self.target != None and self.CtoDcheck(self.target):
                     if self.state != 'ATTACK':
-                        if self.StoScheck(self.target) and self.target.faction == self.faction:
-                            game_world.remove_object(self.target)
-                            self.target = None
-                            self.hold = True
-                            self.state = 'HOLD'
-                            self.Range = 500
                         for o in game_world.objects[1]:
-                            if self.CtoDcheck(o) and o.faction == self.faction and not self.hold:
+                            if self.CtoDcheck(o) and type(o) is CAR and not self.hold:
                                 self.target = o
                         if self.target != None and self.dodge <= 0 and self.target.faction == 1:
                             self.frame = 0
@@ -139,10 +133,6 @@ class Golem(enemy):
                 self.dir = 1
             if not self.hold:
                 self.moveto(self.target)
-                for o in game_world.objects[2]:
-                    if self.StoScheck(o):
-                        if self.faction != o.faction:
-                            o.hp -= self.damage
                 if self.frame == 2:
                     self.frame = 0
                     self.dodge = 10
@@ -202,10 +192,34 @@ class Golem(enemy):
         temp = CARBullet(self.x, self.y, self.target.x, self.target.y)
         game_world.add_object(temp, 3)
         game_world.add_collision_pairs(None, temp, 'ally:E-Bullet')
+        game_world.add_collision_pairs(None, temp, 'prop:bullet')
         self.Range = 300
 
     def handle_collision(self, other, group):
         if 'ally:enemy' == group:
             if self.state == 'ATTACK':
                 other.hp -= self.damage
+        if 'prop:enemy' == group:
+            if self.state == 'ATTACK':
+                other.hp -= self.damage
+            if type(other) is CAR:
+                game_world.remove_object(other)
+                game_world.remove_collision_object(other)
+                self.target = None
+                self.hold = True
+                self.state = 'HOLD'
+                self.Range = 500
+
+        if 'unit:unit' == group:
+            if other != self:
+                if other.x > self.x:
+                    self.x -= other.size / 4
+                elif other.x < self.x:
+                    self.x += other.size / 4
+
+                if other.y > self.y:
+                    self.y -= other.size / 4
+                elif other.y < self.y:
+                    self.y += other.size / 4
+
         pass

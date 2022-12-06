@@ -5,6 +5,8 @@ from bullet import Bullet
 
 class Goblin(enemy):
     image = None
+    attack_sound = None
+    death_sound = None
     def __init__(self, x, y, faction = None):
         self.x = x
         self.y = y
@@ -23,6 +25,12 @@ class Goblin(enemy):
         self.target = None
         if Goblin.image == None:
             Goblin.image = load_image('resource/enemy.png')
+        if Goblin.attack_sound == None:
+            Goblin.attack_sound = load_wav('resource/sound/goblin_attack.wav')
+        Goblin.attack_sound.set_volume(32)
+        if Goblin.death_sound == None:
+            Goblin.death_sound = load_wav('resource/sound/goblin_death.wav')
+        Goblin.death_sound.set_volume(32)
 
     def draw(self):
         if self.state == 'IDLE':
@@ -65,6 +73,7 @@ class Goblin(enemy):
                 else:
                     self.moveto()
             if self.hp <= 0 and self.state != 'DEAD':
+                self.death_sound.play()
                 self.state = 'DEAD'
                 self.frame = 0
         pass
@@ -91,11 +100,24 @@ class Goblin(enemy):
         if self.target != None and self.CtoDcheck(self.target):
             self.state = 'IDLE'
             if self.tick % 20 == 0:
+                self.attack_sound.play()
                 temp = Bullet(self.x, self.y, self.target.x, self.target.y, faction = self.faction)
                 game_world.add_object(temp, 3)
                 game_world.add_collision_pairs(None, temp, 'ally:E-Bullet')
+                game_world.add_collision_pairs(None, temp, 'prop:bullet')
 
 
     def handle_collision(self, other, group):
+        if 'unit:unit' == group:
+            if other != self:
+                if other.x > self.x:
+                    self.x -= other.size / 4
+                elif other.x < self.x:
+                    self.x += other.size / 4
+
+                if other.y > self.y:
+                    self.y -= other.size / 4
+                elif other.y < self.y:
+                    self.y += other.size / 4
         pass
 

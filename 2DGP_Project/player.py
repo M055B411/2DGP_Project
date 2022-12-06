@@ -1,12 +1,18 @@
+from bullet import Bullet
 from object import *
 
 
 
 class Player(Object):
     image =None
+
+
+
+    attack_sound = None
+    death_sound = None
     def __init__(self):
         self.x, self.y = 400, 300
-        self.statement = {'idle': 4, 'move': 2, 'shoot': 4}
+        self.statement = {'idle': 4, 'move': 2, 'shoot': 4, 'death': 5}
         self.look = {'front': 0, 'right': 1, 'back': 2, 'back_right': 3, 'left': 4, 'back_left': 6, 'front_left': 7, 'front_right': 8}
         self.hp = 20
         self.frame = 0
@@ -21,49 +27,65 @@ class Player(Object):
         self.dirx, self.diry = 0, 0
         self.iscollidex, self.iscollidey = False, False
 
+        if Player.attack_sound == None:
+            Player.attack_sound = load_wav('resource/sound/player_attack.wav')
+        Player.attack_sound.set_volume(32)
+
+        if Player.death_sound == None:
+            Player.death_sound = load_wav('resource/sound/player_death.wav')
+        Player.attack_sound.set_volume(32)
+
+        self.item = 'PISTOL'
+
+
+
     def handle_collision(self, other, group):
         pass
 
 
     def update(self):
-        if self.hp <= 0:
-            print("player dead")
-        else:
-            self.tick = (self.tick + 1) % 8
-            if self.tick == 0:
-                self.frame = (self.frame + 1) % self.state
+        if self.state != 'death':
+            if self.hp <= 0:
+                print("player dead")
+                self.state = 'death'
+                self.death_sound.play()
+                game_world.remove_collision_object(self)
+            else:
+                self.tick = (self.tick + 1) % 8
+                if self.tick == 0:
+                    self.frame = (self.frame + 1) % self.state
 
-            self.state_check()
+                self.state_check()
 
-            if self.dirx == 1 and self.diry == 1:
-                self.x += 2/1.414
-                self.y += 2/1.414
-            elif self.dirx == 1 and self.diry == -1:
-                self.x += 2/1.414
-                self.y -= 2/1.414
-            elif self.dirx == -1 and self.diry == 1:
-                self.x -= 2/1.414
-                self.y += 2/1.414
-            elif self.dirx == -1 and self.diry == -1:
-                self.x -= 2/1.414
-                self.y -= 2/1.414
-            elif self.dirx == 1 and self.diry == 0:
-                self.x += 2
-            elif self.dirx == -1 and self.diry == 0:
-                self.x -= 2
-            elif self.dirx == 0 and self.diry == 1:
-                self.y += 2
-            elif self.dirx == 0 and self.diry == -1:
-                self.y -= 2
+                if self.dirx == 1 and self.diry == 1:
+                    self.x += 2/1.414
+                    self.y += 2/1.414
+                elif self.dirx == 1 and self.diry == -1:
+                    self.x += 2/1.414
+                    self.y -= 2/1.414
+                elif self.dirx == -1 and self.diry == 1:
+                    self.x -= 2/1.414
+                    self.y += 2/1.414
+                elif self.dirx == -1 and self.diry == -1:
+                    self.x -= 2/1.414
+                    self.y -= 2/1.414
+                elif self.dirx == 1 and self.diry == 0:
+                    self.x += 2
+                elif self.dirx == -1 and self.diry == 0:
+                    self.x -= 2
+                elif self.dirx == 0 and self.diry == 1:
+                    self.y += 2
+                elif self.dirx == 0 and self.diry == -1:
+                    self.y -= 2
 
-            if self.x > 800:
-                self.x = 800
-            if self.x < 0:
-                self.x = 0
-            if self.y > 600:
-                self.y = 0
-            if self.y < 0:
-                self.y = 0
+                if self.x > 800:
+                    self.x = 800
+                if self.x < 0:
+                    self.x = 0
+                if self.y > 600:
+                    self.y = 0
+                if self.y < 0:
+                    self.y = 0
 
     def draw(self):
         size = 22
@@ -166,3 +188,34 @@ class Player(Object):
                 self.lookat = self.look['back_right']
             elif self.x > x:
                 self.lookat = self.look['back_left']
+
+    def shot_bullet(self, event):
+        if self.item == 'PISTOL':
+            self.attack_sound.play()
+            self.state = self.statement['shoot']
+            temp = Bullet(self.x, self.y, event.x, 600 - event.y, faction=self.faction)
+            game_world.add_object(temp, 3)
+            game_world.add_collision_pairs(temp, None, 'A-Bullet:enemy')
+            game_world.add_collision_pairs(None, temp, 'prop:bullet')
+        if self.item == 'SHOTGUN':
+            self.attack_sound.play()
+            self.state = self.statement['shoot']
+            for i in range(0, 4):
+                temp = Bullet(self.x, self.y, (event.x + random.randrange(0, 40)), 600 - (event.y + random.randrange(0,40)), faction=self.faction)
+                game_world.add_object(temp, 3)
+                game_world.add_collision_pairs(temp, None, 'A-Bullet:enemy')
+                game_world.add_collision_pairs(None, temp, 'prop:bullet')
+
+    def handle_collision(self, other, group):
+        if 'prop:player' == group:
+            if other.x > self.x:
+                self.x -= other.size / 2
+            elif other.x < self.x:
+                self.x += other.size / 2
+
+            if other.y > self.y:
+                self.y -= other.size / 2
+            elif other.y < self.y:
+                self.y += other.size / 2
+
+        pass

@@ -1,5 +1,6 @@
 import goblin
 import wolf
+from car import CAR
 from object import *
 import game_framework
 import game_world
@@ -10,6 +11,9 @@ from goblin import Goblin
 from wolf import Wolf
 from robot import Robot
 from golem import Golem
+from crytstal import Crystal
+from block import Block
+from tile import Tile
 
 from player import Player
 
@@ -28,18 +32,33 @@ def collide(a, b):
     return True
 
 def enter():
-    global player, cursor, Tile
+    global player, crystal, cursor, Tile
     hide_cursor()
     player = Player()
+    crystal = Crystal()
     cursor = Cursor()
-    # Tile = Tile()
-    # game_world.add_object(Tile, 0)
+    Tile = Tile()
+    game_world.add_object(Tile, 0)
+    game_world.add_object(crystal, 2)
     game_world.add_object(player, 2)
     game_world.add_object(cursor, 4)
 
+    for i in range(0, 30):
+        temp = Block(random.randrange(50, 750), random.randrange(50, 550))
+        game_world.add_object(temp, 1)
+        game_world.add_collision_pairs(temp, None, 'prop:enemy')
+        game_world.add_collision_pairs(temp, None, 'prop:player')
+        game_world.add_collision_pairs(temp, None, 'prop:bullet')
+        game_world.add_collision_pairs(temp, temp, 'prop:prop')
+
     game_world.add_collision_pairs(player, None, 'ally:E-Bullet')
     game_world.add_collision_pairs(player, None, 'ally:enemy')
+    game_world.add_collision_pairs(crystal, None, 'ally:E-Bullet')
+    game_world.add_collision_pairs(crystal, None, 'ally:enemy')
     game_world.add_collision_pairs(None, None, 'A-Bullet:enemy')
+    game_world.add_collision_pairs(None, None, 'prop:enemy')
+    game_world.add_collision_pairs(None, player, 'prop:player')
+    game_world.add_collision_pairs(None, None, 'prop:bullet')
     pass
 
 def exit():
@@ -55,12 +74,16 @@ def update():
         temp = bomb(random.randrange(50, 750), random.randrange(50, 550), 30)
         bomb.bomb_list.append(temp)
         game_world.add_object(temp, 2)
+        game_world.add_collision_pairs(temp, None, 'prop:enemy')
+        game_world.add_collision_pairs(temp, None, 'prop:player')
+        game_world.add_collision_pairs(temp, None, 'prop:bullet')
+        game_world.add_collision_pairs(temp, temp, 'prop:prop')
     player.update()
     for game_object in game_world.all_objects():
         game_object.update()
     for a, b, group in game_world.all_collision_pairs():
         if collide(a, b):
-            print('COLLISION ', group)
+            # print('COLLISION ', group)
             a.handle_collision(b, group)
             b.handle_collision(a, group)
     pass
@@ -100,23 +123,35 @@ def handle_events():
                 game_world.add_object(temp, 2)
                 game_world.add_collision_pairs(None, temp, 'ally:enemy')
                 game_world.add_collision_pairs(None, temp, 'A-Bullet:enemy')
+                game_world.add_collision_pairs(None, temp, 'prop:enemy')
+                game_world.add_collision_pairs(temp, temp, 'unit:unit')
             elif event.key == SDLK_2:
                 temp = Wolf(random.randrange(50, 750), random.randrange(50, 550))
                 game_world.add_object(temp, 2)
                 game_world.add_collision_pairs(None, temp, 'ally:enemy')
                 game_world.add_collision_pairs(None, temp, 'A-Bullet:enemy')
+                game_world.add_collision_pairs(None, temp, 'prop:enemy')
+                game_world.add_collision_pairs(temp, temp, 'unit:unit')
             elif event.key == SDLK_3:
                 temp = Robot(random.randrange(50, 750), random.randrange(50, 550))
                 game_world.add_object(temp, 2)
                 game_world.add_collision_pairs(None, temp, 'ally:enemy')
                 game_world.add_collision_pairs(None, temp, 'A-Bullet:enemy')
+                game_world.add_collision_pairs(None, temp, 'prop:enemy')
+                game_world.add_collision_pairs(temp, temp, 'unit:unit')
             elif event.key == SDLK_4:
                 temp = Golem(random.randrange(50, 750), random.randrange(50, 550))
                 game_world.add_object(temp, 2)
                 game_world.add_collision_pairs(None, temp, 'ally:enemy')
                 game_world.add_collision_pairs(None, temp, 'A-Bullet:enemy')
+                game_world.add_collision_pairs(None, temp, 'prop:enemy')
+                game_world.add_collision_pairs(temp, temp, 'unit:unit')
                 temp = CAR(random.randrange(50, 750), random.randrange(50, 550))
                 game_world.add_object(temp, 1)
+                game_world.add_collision_pairs(temp, None, 'prop:enemy')
+                game_world.add_collision_pairs(temp, None, 'prop:player')
+                game_world.add_collision_pairs(temp, None, 'prop:bullet')
+                game_world.add_collision_pairs(temp, temp, 'prop:prop')
             elif event.key == SDLK_r:
                 for o in game_world.objects[2]:
                     if o.faction == 2:
@@ -137,16 +172,12 @@ def handle_events():
                 player.unmove(3)
             elif event.key == SDLK_p:
                 for b in bomb.bomb_list:
-                    if b.inexplo == False:
-                        b.explosion()
+                     b.explosion()
         elif player.state != player.statement['move'] and event.type == SDL_MOUSEMOTION:
             player.mouse_action(event.x, event.y)
 
         elif event.type == SDL_MOUSEBUTTONDOWN and event.button == SDL_BUTTON_LEFT:
-            player.state = player.statement['shoot']
-            temp = Bullet(player.x, player.y, event.x, 600 - event.y, faction= 1)
-            game_world.add_object(temp, 3)
-            game_world.add_collision_pairs(temp, None, 'A-Bullet:enemy')
+            player.shot_bullet(event)
 
     pass
 

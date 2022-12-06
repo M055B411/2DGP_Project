@@ -5,6 +5,10 @@ from bullet import Bullet
 
 class Robot(enemy):
     image = None
+    attack_sound = None
+    action_sound = None
+    death_sound = None
+    move_sound = None
     def __init__(self, x, y):
         self.x = x
         self.y = y
@@ -21,6 +25,18 @@ class Robot(enemy):
         self.target = None
         if Robot.image == None:
             Robot.image = load_image('resource/enemy.png')
+        if Robot.attack_sound == None:
+            Robot.attack_sound = load_wav('resource/sound/robot_attack.wav')
+        Robot.attack_sound.set_volume(32)
+        if Robot.action_sound == None:
+            Robot.action_sound = load_wav('resource/sound/robot_action.wav')
+        Robot.action_sound.set_volume(32)
+        if Robot.death_sound == None:
+            Robot.death_sound = load_wav('resource/sound/robot_death.wav')
+        Robot.death_sound.set_volume(32)
+        if Robot.move_sound == None:
+            Robot.move_sound = load_wav('resource/sound/robot_move.wav')
+        Robot.move_sound.set_volume(32)
 
     def draw(self):
         if self.state == 'IDLE':
@@ -90,6 +106,7 @@ class Robot(enemy):
             elif self.state == 'DEAD':
                 self.frame = (self.frame + 1)
         if self.hp <= 0 and self.state != 'DEAD':
+            self.death_sound.play()
             self.state = 'DEAD'
             self.frame = 0
         pass
@@ -97,11 +114,14 @@ class Robot(enemy):
 
     def teleport(self, other):
         if other != None:
+            self.action_sound.play()
             self.state = 'TELE'
             self.frame = 0
 
     def moveto(self, other):
         if other != None:
+            if self.tick ==0:
+                self.move_sound.play()
             self.angle = math.atan2(other.y - self.y, other.x - self.x)
             if self.state == 'ATTACK':
                 self.x += 3 * math.cos(self.angle)
@@ -112,9 +132,22 @@ class Robot(enemy):
                 self.y += 1 * math.sin(self.angle)
 
     def attack(self, other):
+        self.attack_sound.play()
         temp = Bullet(self.x, self.y, other.x, other.y, faction=2)
         game_world.add_object(temp, 3)
         game_world.add_collision_pairs(None, temp, 'ally:E-Bullet')
+        game_world.add_collision_pairs(None, temp, 'prop:bullet')
 
     def handle_collision(self, other, group):
+        if 'unit:unit' == group:
+            if other != self:
+                if other.x > self.x:
+                    self.x -= other.size / 4
+                elif other.x < self.x:
+                    self.x += other.size / 4
+
+                if other.y > self.y:
+                    self.y -= other.size / 4
+                elif other.y < self.y:
+                    self.y += other.size / 4
         pass

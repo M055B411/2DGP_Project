@@ -34,14 +34,6 @@ class CARBullet(Object):
         elif self.dir == -1:
             if self.x < self.tox:
                 self.explode()
-        for obj in game_world.layer_objects(1):
-            if self.StoScheck(obj):
-                self.explode()
-        for obj in game_world.layer_objects(2):
-            if self.StoScheck(obj):
-                if self.faction != obj.faction:
-                    print("collide")
-                    self.explode()
 
 
         if self.x > 800 or self.x < 0:
@@ -67,4 +59,51 @@ class CARBullet(Object):
     def handle_collision(self, other, group):
         if 'ally:E-Bullet' == group:
             self.explode()
+        pass
+
+class CAR(Object):
+    bomb_list = []
+    image = None
+    image2 = None
+
+    def __init__(self , x, y, Range = None):
+        self.x = x
+        self.y = y
+        self.hp = 20
+        self.size = 40
+        self.tick = 0
+        self.damage = 2
+        self.faction = 2
+        if Range == None:
+            Range == 80
+        else: self.Range = Range
+        if CAR.image == None:
+            CAR.image = load_image('resource/enemy.png')
+
+    def draw(self):
+        self.image.clip_draw(92, 768 - 525, 35, 24, self.x, self.y, 40, 30)
+
+    def update(self):
+        if self.hp <= 0:
+            self.explosion()
+
+
+    def explosion(self):
+        temp = Explosion(self.x, self.y, Damage=self.damage, size=80, Range=80)
+        game_world.add_object(temp, 3)
+        game_world.remove_object(self)
+        game_world.remove_collision_object(self)
+
+    def handle_collision(self, other, group):
+        if 'prob:player' == group or 'prop:enemy' == group:
+            if other.x > self.x:
+                other.x = self.x + self.size/ 2
+            elif other.x < self.x:
+                other.x = self.x - self.size/2
+
+            if other.y > self.y:
+                other.y = self.y + self.size/ 2
+            elif other.y < self.y:
+                other.y = self.y - self.size/2
+
         pass

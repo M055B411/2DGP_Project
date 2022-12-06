@@ -14,7 +14,7 @@ class Bullet(Object):
             self.faction = faction
         self.angle = math.atan2(self.toy - self.y, self.tox - self.x)
         if Bullet.image == None:
-            Bullet.image = load_image('resource/Player.png')
+            Bullet.image = load_image('resource/Player2.png')
 
         if range == None:
             self.Range = 0
@@ -24,22 +24,6 @@ class Bullet(Object):
         else: self.hp = hp
 
     def update(self):
-
-        for obj in game_world.layer_objects(1):
-            if self.StoScheck(obj):
-                game_world.remove_object(self)
-        for obj in game_world.layer_objects(2):
-            if self.StoScheck(obj):
-                if self.faction != obj.faction:
-                    print("collide")
-                    if self.Range == 0:
-                        obj.hp -= self.hp
-                    else:
-                        for o in game_world.layer_objects(2):
-                            if self.CtoDcheck(o):
-                                o.hp -= self.hp
-                    game_world.remove_object(self)
-                    game_world.remove_collision_object(self)
         self.move()
         if self.x > 800 or self.x < 0:
             game_world.remove_object(self)
@@ -59,7 +43,15 @@ class Bullet(Object):
 
     def handle_collision(self, other, group):
         if 'ally:E-Bullet' == group:
-                other.hp -= self.hp
+            other.hp -= self.hp
+            game_world.remove_object(self)
+            game_world.remove_collision_object(self)
         elif 'A-Bullet:enemy' == group:
-                other.hp -= self.hp
+            other.hp -= self.hp
+            game_world.remove_object(self)
+            game_world.remove_collision_object(self)
+        elif 'prop:bullet' == group:
+            other.hp -= self.hp
+            game_world.remove_object(self)
+            game_world.remove_collision_object(self)
         pass

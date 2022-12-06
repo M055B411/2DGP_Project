@@ -1,40 +1,30 @@
 from object import *
-import explosion
 
-class bomb(Object):
-    bomb_list = []
+class Block(Object):
     image = None
 
-    def __init__(self , x, y, Range = None):
+    def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.hp = 5
-        self.size = 21
-        self.tick = 0
-        self.damage = 2
-        self.faction = 3
-        if Range == None:
-            Range == 64
-        self.Range = Range
-        self.frame = random.randrange(0, 7)
-        if bomb.image == None:
-            bomb.image = load_image('resource/bomb.png')
+        self.hp = 0
+        self.size = 32
+        self.frame = random.randrange(0, 2)
 
-    def draw(self):
-        self.image.clip_draw(5 + (21 * self.frame), 30, 21, 21, self.x, self.y)
+        if Block.image == None:
+            Block.image = load_image('resource/block.png')
 
     def update(self):
-        if self.hp <= 0:
-            self.explosion()
+        pass
 
+    def draw(self):
+        if self.frame == 0:
+            self.image.clip_draw(1, 79-33, 32, 32, self.x, self.y)
+        elif self.frame == 1:
+            self.image.clip_draw(40, 79-33, 32, 32, self.x, self.y)
+        pass
 
-
-    def explosion(self):
-        temp = explosion.Explosion(self.x, self.y, Damage=self.damage, size=64, Range=64)
-        game_world.add_object(temp, 3)
-        game_world.remove_object(self)
-        game_world.remove_collision_object(self)
-        bomb.bomb_list.remove(self)
+    def exit(self):
+        pass
 
     def handle_collision(self, other, group):
         if 'prob:player' == group or 'prop:enemy' == group:
@@ -59,4 +49,4 @@ class bomb(Object):
                     self.y -= other.size / 2
                 elif other.y < self.y:
                     self.y += other.size / 2
-
+        pass

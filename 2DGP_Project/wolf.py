@@ -3,6 +3,10 @@ from Enemy import *
 
 class Wolf(enemy):
     image = None
+
+    attack_sound = None
+    action_sound = None
+    death_sound = None
     def __init__(self, x, y):
         self.x = x
         self.y = y
@@ -20,6 +24,15 @@ class Wolf(enemy):
         self.target = None
         if Wolf.image == None:
             Wolf.image = load_image('resource/enemy.png')
+        if Wolf.attack_sound == None:
+            Wolf.attack_sound = load_wav('resource/sound/wolf_attack.wav')
+        Wolf.attack_sound.set_volume(32)
+        # if Wolf.action_sound == None:
+        #     Wolf.action_sound = load_wav('resource/sound/wolf_action.wav')
+        # Wolf.action_sound.set_volume(32)
+        if Wolf.death_sound == None:
+            Wolf.death_sound = load_wav('resource/sound/wolf_death.wav')
+        Wolf.death_sound.set_volume(32)
 
     def draw(self):
         if self.state == 'IDLE':
@@ -71,7 +84,7 @@ class Wolf(enemy):
                     self.moveto(self.target)
                     if self.tick == 0:
                         self.cnt += 1
-                    if self.cnt == 2:
+                    if self.cnt == 6:
                         self.cnt = 0
                         self.target = None
                         self.state = 'IDLE'
@@ -84,7 +97,7 @@ class Wolf(enemy):
             self.moveto(self.target)
             if self.tick == 0:
                 self.cnt += 1
-            if self.cnt == 2:
+            if self.cnt == 6:
                 self.cnt = 0
                 self.state = 'IDLE'
                 self.cooldown = 5
@@ -98,6 +111,7 @@ class Wolf(enemy):
             elif self.state == 'DEAD':
                 self.frame = (self.frame + 1)
         if self.hp <= 0 and self.state != 'DEAD':
+            self.death_sound.play()
             self.state = 'DEAD'
             self.frame = 0
         pass
@@ -116,6 +130,7 @@ class Wolf(enemy):
                 self.y += 1 * math.sin(self.angle)
 
     def attack(self, other):
+        self.attack_sound.play()
         self.cnt = 0
         self.state = 'ATTACK'
 
@@ -123,4 +138,18 @@ class Wolf(enemy):
         if 'ally:enemy' == group:
             if self.state == 'ATTACK':
                 other.hp -= self.damage
+        if 'prop:enemy' == group:
+            if self.state == 'ATTACK':
+                other.hp -= self.damage
+        if 'unit:unit' == group:
+            if other != self:
+                if other.x > self.x:
+                    self.x -= other.size / 4
+                elif other.x < self.x:
+                    self.x += other.size / 4
+
+                if other.y > self.y:
+                    self.y -= other.size / 4
+                elif other.y < self.y:
+                    self.y += other.size / 4
         pass
