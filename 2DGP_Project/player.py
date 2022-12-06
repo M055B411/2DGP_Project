@@ -3,6 +3,7 @@ from object import *
 
 
 class Player(Object):
+    image =None
     def __init__(self):
         self.x, self.y = 400, 300
         self.statement = {'idle': 4, 'move': 2, 'shoot': 4}
@@ -15,15 +16,13 @@ class Player(Object):
         self.state = self.statement['idle']
         self.faction = 1
         if Player.image == None:
-            Player.image = load_image("Player.png")
+            Player.image = load_image("resource/Player.png")
         self.range = 10
         self.dirx, self.diry = 0, 0
         self.iscollidex, self.iscollidey = False, False
 
-    def collision(self, other):
-        if self.StoScheck(other):
-            if self.faction != other.faction:
-                print("collide")
+    def handle_collision(self, other, group):
+        pass
 
 
     def update(self):
@@ -65,11 +64,6 @@ class Player(Object):
                 self.y = 0
             if self.y < 0:
                 self.y = 0
-
-            for o in game_world.objects[1]:
-                self.collision(o)
-            for o in game_world.objects[2]:
-                self.collision(o)
 
     def draw(self):
         size = 22

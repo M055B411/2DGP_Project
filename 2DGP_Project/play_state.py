@@ -1,21 +1,45 @@
+import goblin
+import wolf
 from object import *
 import game_framework
 import game_world
-import Enemy
+from cursor import Cursor
+from bullet import Bullet
+from bomb import bomb
+from goblin import Goblin
+from wolf import Wolf
+from robot import Robot
+from golem import Golem
 
 from player import Player
 
 worldtick = 0
 
+def collide(a, b):
+    # fill here
+    left_a, bottom_a, right_a, top_a = a.get_bb()
+    left_b, bottom_b, right_b, top_b = b.get_bb()
+
+    if left_a > right_b: return False
+    if right_a < left_b: return False
+    if top_a < bottom_b: return False
+    if bottom_a > top_b: return False
+
+    return True
+
 def enter():
     global player, cursor, Tile
     hide_cursor()
     player = Player()
-    cursor = cursor()
+    cursor = Cursor()
     # Tile = Tile()
     # game_world.add_object(Tile, 0)
     game_world.add_object(player, 2)
     game_world.add_object(cursor, 4)
+
+    game_world.add_collision_pairs(player, None, 'ally:E-Bullet')
+    game_world.add_collision_pairs(player, None, 'ally:enemy')
+    game_world.add_collision_pairs(None, None, 'A-Bullet:enemy')
     pass
 
 def exit():
@@ -34,6 +58,11 @@ def update():
     player.update()
     for game_object in game_world.all_objects():
         game_object.update()
+    for a, b, group in game_world.all_collision_pairs():
+        if collide(a, b):
+            print('COLLISION ', group)
+            a.handle_collision(b, group)
+            b.handle_collision(a, group)
     pass
 
 def draw_world():
@@ -67,17 +96,25 @@ def handle_events():
             elif event.key == SDLK_d:
                 player.move(3)
             elif event.key == SDLK_1:
-                temp = Enemy.enemy1(random.randrange(50, 750), random.randrange(50, 550))
+                temp = Goblin(random.randrange(50, 750), random.randrange(50, 550))
                 game_world.add_object(temp, 2)
+                game_world.add_collision_pairs(None, temp, 'ally:enemy')
+                game_world.add_collision_pairs(None, temp, 'A-Bullet:enemy')
             elif event.key == SDLK_2:
-                temp = Enemy.enemy2(random.randrange(50, 750), random.randrange(50, 550))
+                temp = Wolf(random.randrange(50, 750), random.randrange(50, 550))
                 game_world.add_object(temp, 2)
+                game_world.add_collision_pairs(None, temp, 'ally:enemy')
+                game_world.add_collision_pairs(None, temp, 'A-Bullet:enemy')
             elif event.key == SDLK_3:
-                temp = Enemy.enemy3(random.randrange(50, 750), random.randrange(50, 550))
+                temp = Robot(random.randrange(50, 750), random.randrange(50, 550))
                 game_world.add_object(temp, 2)
+                game_world.add_collision_pairs(None, temp, 'ally:enemy')
+                game_world.add_collision_pairs(None, temp, 'A-Bullet:enemy')
             elif event.key == SDLK_4:
-                temp = Enemy.enemy4(random.randrange(50, 750), random.randrange(50, 550))
+                temp = Golem(random.randrange(50, 750), random.randrange(50, 550))
                 game_world.add_object(temp, 2)
+                game_world.add_collision_pairs(None, temp, 'ally:enemy')
+                game_world.add_collision_pairs(None, temp, 'A-Bullet:enemy')
                 temp = CAR(random.randrange(50, 750), random.randrange(50, 550))
                 game_world.add_object(temp, 1)
             elif event.key == SDLK_r:
@@ -109,6 +146,7 @@ def handle_events():
             player.state = player.statement['shoot']
             temp = Bullet(player.x, player.y, event.x, 600 - event.y, faction= 1)
             game_world.add_object(temp, 3)
+            game_world.add_collision_pairs(temp, None, 'A-Bullet:enemy')
 
     pass
 
