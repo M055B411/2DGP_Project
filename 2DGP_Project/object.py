@@ -23,10 +23,11 @@ class Object:
 
 
     def CtoDcheck(self, other):
-        a = self.x - other.x
-        b = self.y - other.y
-        if int(math.sqrt((a * a) + (b * b))) < self.Range:
-            return True
+        if other != None:
+            a = self.x - other.x
+            b = self.y - other.y
+            if int(math.sqrt((a * a) + (b * b))) < self.Range:
+                return True
         else:
             return False
 

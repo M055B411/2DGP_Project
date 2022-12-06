@@ -1,5 +1,6 @@
 from bullet import Bullet
 from object import *
+import server
 
 
 
@@ -14,7 +15,7 @@ class Player(Object):
         self.x, self.y = 400, 300
         self.statement = {'idle': 4, 'move': 2, 'shoot': 4, 'death': 5}
         self.look = {'front': 0, 'right': 1, 'back': 2, 'back_right': 3, 'left': 4, 'back_left': 6, 'front_left': 7, 'front_right': 8}
-        self.hp = 20
+        self.hp = 40
         self.frame = 0
         self.tick = 0
         self.size = 22
@@ -49,7 +50,7 @@ class Player(Object):
                 print("player dead")
                 self.state = 'death'
                 self.death_sound.play()
-                game_world.remove_collision_object(self)
+                server.cooldown = 10
             else:
                 self.tick = (self.tick + 1) % 8
                 if self.tick == 0:
@@ -209,13 +210,13 @@ class Player(Object):
     def handle_collision(self, other, group):
         if 'prop:player' == group:
             if other.x > self.x:
-                self.x -= other.size / 2
+                self.x -= self.size / 4
             elif other.x < self.x:
-                self.x += other.size / 2
+                self.x += self.size / 4
 
             if other.y > self.y:
-                self.y -= other.size / 2
+                self.y -= self.size / 4
             elif other.y < self.y:
-                self.y += other.size / 2
+                self.y += self.size / 4
 
         pass

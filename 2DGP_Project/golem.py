@@ -4,6 +4,7 @@ from car import CARBullet, CAR
 
 class Golem(enemy):
     image = None
+    attack_sound = None
     def __init__(self, x, y):
         self.x = x
         self.y = y
@@ -22,6 +23,9 @@ class Golem(enemy):
         self.hold = False
         if Golem.image == None:
             Golem.image = load_image('resource/enemy.png')
+        if Golem.attack_sound == None:
+            Golem.attack_sound = load_wav('resource/sound/golem_attack.wav')
+        Golem.attack_sound.set_volume(32)
 
     def draw(self):
         if self.hold:
@@ -183,10 +187,12 @@ class Golem(enemy):
                     self.y += 1 * math.sin(self.angle)
 
     def attack(self, other):
+        self.attack_sound.play()
         self.cnt = 0
         self.state = 'ATTACK'
 
     def throw(self):
+        self.attack_sound.play()
         self.cnt = 0
         self.state = 'ATTACK'
         temp = CARBullet(self.x, self.y, self.target.x, self.target.y)
@@ -196,6 +202,8 @@ class Golem(enemy):
         self.Range = 300
 
     def handle_collision(self, other, group):
+        if 'A-Bullet:enemy' == group:
+            self.target = None
         if 'ally:enemy' == group:
             if self.state == 'ATTACK':
                 other.hp -= self.damage

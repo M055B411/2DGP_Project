@@ -139,6 +139,8 @@ class Robot(enemy):
         game_world.add_collision_pairs(None, temp, 'prop:bullet')
 
     def handle_collision(self, other, group):
+        if 'A-Bullet:enemy' == group:
+            self.target = None
         if 'unit:unit' == group:
             if other != self:
                 if other.x > self.x:

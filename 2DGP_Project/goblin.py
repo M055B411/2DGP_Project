@@ -1,6 +1,6 @@
-import play_state
 from Enemy import *
 from bullet import Bullet
+from crytstal import Crystal
 
 
 class Goblin(enemy):
@@ -108,6 +108,8 @@ class Goblin(enemy):
 
 
     def handle_collision(self, other, group):
+        if 'A-Bullet:enemy' == group:
+            self.target = None
         if 'unit:unit' == group:
             if other != self:
                 if other.x > self.x:

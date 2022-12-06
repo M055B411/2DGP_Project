@@ -2,11 +2,12 @@ from object import *
 
 class Crystal(Object):
     image =None
+    font = None
 
     def __init__(self):
         self.x = 400
         self.y = 360
-        self.hp = 100
+        self.hp = 300
         self.faction = 1
         self.frame = 0
         self.tick = 0
@@ -14,6 +15,7 @@ class Crystal(Object):
 
         if Crystal.image == None:
             Crystal.image = load_image('resource/crystal.png')
+        self.font = load_font('resource/ENCR10B.TTF', 16)
 
     def update(self):
         self.tick = (self.tick + 1) % 20
@@ -25,6 +27,7 @@ class Crystal(Object):
         pass
 
     def draw(self):
+        self.font.draw(self.x, self.y + 50, '%5d' % self.hp, (255, 255, 0))
         if self.state == 'IDLE':
             self.image.clip_draw(1 + 43 * self.frame, 485 - 100, 42, 89, self.x, self.y)
         elif self.state == 'DEATH':

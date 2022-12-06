@@ -135,6 +135,8 @@ class Wolf(enemy):
         self.state = 'ATTACK'
 
     def handle_collision(self, other, group):
+        if 'A-Bullet:enemy' == group:
+            self.target = None
         if 'ally:enemy' == group:
             if self.state == 'ATTACK':
                 other.hp -= self.damage
